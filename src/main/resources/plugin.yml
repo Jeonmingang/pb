@@ -1,8 +1,0 @@
-name: PokeBagPhoto
-main: com.example.pokebagphoto.PokeBagPhoto
-version: 1.1.4
-api-version: 1.16
-commands:
-  pb:
-    description: Take a Pixelmon party slot as a photo item (no PC), restore on right-click.
-    usage: /pb <1-6> [targetSlot]
