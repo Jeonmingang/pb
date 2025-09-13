@@ -1,0 +1,37 @@
+name: Build Pixelmon Patch ZIP
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      PATCH_NAME: pixelmon_dynamaxden_patch
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # repo 안에 아래 경로가 존재해야 합니다:
+      # data/pixelmon/drops/raiddrops.json
+      # data/pixelmon/spawning/forage/loot/forage_loot.set.json
+
+      - name: Validate required files
+        run: |
+          test -f data/pixelmon/drops/raiddrops.json
+          test -f data/pixelmon/spawning/forage/loot/forage_loot.set.json
+
+      - name: Package patch as ZIP (datapack/override)
+        run: |
+          zip -r "${{ env.PATCH_NAME }}.zip" data
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PATCH_NAME }}
+          path: ${{ env.PATCH_NAME }}.zip
+          if-no-files-found: error
