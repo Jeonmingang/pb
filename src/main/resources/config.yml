@@ -1,0 +1,13 @@
+# PocketPhoto v1.2.0
+language: "ko"
+
+# 픽셀몬 스프라이트를 지도에 렌더(실패 시 종이).
+use-map-sprite: true
+map-scale: 2  # 0~4
+
+# /pokegive 슬롯 키 (서버에 따라 slot 또는 s)
+pokegive-slot-key: "slot"
+
+# 사진 아이템의 제목/로어 포맷
+photo-title-format: "§e[ 포켓 사진 ] §f%species% §7Lv %level%"
+rich-lore: true
