@@ -4,11 +4,9 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.Method;
 
 public class PixelmonSpecUtil {
-
     public static class Result {
         public boolean success;
         public String message;
-
         public String species = "Unknown";
         public String nickname = "";
         public int level = 1;
@@ -25,16 +23,13 @@ public class PixelmonSpecUtil {
         public String ball = "";
         public int hp = 0;
         public int hatchProgress = -1;
-        public boolean neutered = false; // 중성화 여부
-
+        public boolean neutered = false;
         public java.util.List<String> moves = new java.util.ArrayList<>();
         public java.util.List<Integer> movePP = new java.util.ArrayList<>();
         public java.util.List<Integer> moveMaxPP = new java.util.ArrayList<>();
-
         public int slot = 1;
         public String specString = "";
         public String nbtBase64 = "";
-
         public java.util.Map<String, Object> toJsonForItem() {
             java.util.Map<String, Object> m = new java.util.LinkedHashMap<>();
             m.put("slot", slot);
@@ -76,16 +71,13 @@ public class PixelmonSpecUtil {
             Method get = party.getClass().getMethod("get", int.class);
             Object pokemon = get.invoke(party, index);
             if (pokemon == null) { r.success=false; r.message="해당 슬롯에 포켓몬이 없습니다."; return r; }
-
             fillInfoFromPokemon(pokemon, r);
             r.specString = buildSpecStringFromPokemon(pokemon, r);
             r.nbtBase64 = tryWriteNbtBase64(pokemon);
-
             try {
                 Method set = party.getClass().getMethod("set", int.class, Class.forName("com.pixelmonmod.pixelmon.api.pokemon.Pokemon"));
                 set.invoke(party, new Object[]{index, null});
             } catch (Throwable ignored) {}
-
             r.success = true; r.message="OK"; return r;
         } catch (Throwable t) {
             r.success=false; r.message="Pixelmon API 접근 실패: " + t.getClass().getSimpleName(); return r;
@@ -105,7 +97,6 @@ public class PixelmonSpecUtil {
             } catch (Throwable t) {
                 tag = nbtCls.getConstructor().newInstance();
             }
-
             Object poke = null;
             try {
                 Class<?> factory = Class.forName("com.pixelmonmod.pixelmon.api.pokemon.PokemonFactory");
@@ -119,7 +110,6 @@ public class PixelmonSpecUtil {
                 } catch (Throwable ignored) {}
             }
             if (poke == null) return false;
-
             Class<?> storageProxy = Class.forName("com.pixelmonmod.pixelmon.api.storage.StorageProxy");
             Method getParty = storageProxy.getMethod("getParty", java.util.UUID.class);
             Object party = getParty.invoke(null, p.getUniqueId());
@@ -137,14 +127,10 @@ public class PixelmonSpecUtil {
             Class<?> nbtCls = Class.forName("net.minecraft.nbt.CompoundNBT");
             Object tag = nbtCls.getConstructor().newInstance();
             boolean wrote = false;
-
             String[] methods = new String[]{"writeToNBT", "writeNBT", "save", "write"};
             for (String mName : methods) {
-                try {
-                    Method m = pokemon.getClass().getMethod(mName, nbtCls);
-                    m.invoke(pokemon, tag);
-                    wrote = true; break;
-                } catch (Throwable ignored) {}
+                try { Method m = pokemon.getClass().getMethod(mName, nbtCls); m.invoke(pokemon, tag); wrote = true; break; }
+                catch (Throwable ignored) {}
             }
             if (!wrote) {
                 try {
@@ -155,19 +141,14 @@ public class PixelmonSpecUtil {
                 } catch (Throwable ignored) {}
             }
             if (!wrote) return "";
-
             try {
                 Class<?> cst = Class.forName("net.minecraft.nbt.CompressedStreamTools");
                 java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
                 Method write = cst.getMethod("writeCompressed", nbtCls, java.io.OutputStream.class);
                 write.invoke(null, tag, baos);
                 return java.util.Base64.getEncoder().encodeToString(baos.toByteArray());
-            } catch (Throwable t) {
-                return "";
-            }
-        } catch (Throwable t) {
-            return "";
-        }
+            } catch (Throwable t) { return ""; }
+        } catch (Throwable t) { return ""; }
     }
 
     private static void fillInfoFromPokemon(Object pokemon, Result r) throws Exception {
@@ -187,15 +168,8 @@ public class PixelmonSpecUtil {
         try { Object o = pokemon.getClass().getMethod("getForm").invoke(pokemon); if (o != null) r.form = o.toString(); } catch (Throwable ignored) {}
         try { Object o = pokemon.getClass().getMethod("getCaughtBall").invoke(pokemon); if (o != null) r.ball = o.toString(); } catch (Throwable ignored) {}
         try { Object o = pokemon.getClass().getMethod("getEggSteps").invoke(pokemon); if (o instanceof Number) r.hatchProgress = ((Number) o).intValue(); } catch (Throwable ignored) {}
-        // 중성화 여부 추출: 여러 메서드명을 시도 (서버/버전에 따라 다름)
         String[] neuters = new String[]{"isNeutered","getNeutered","isSterilized","getSterilized","isInfertile","isUnbreedable"};
-        for (String m : neuters) {
-            try {
-                Object v = pokemon.getClass().getMethod(m).invoke(pokemon);
-                if (v instanceof Boolean) { r.neutered = ((Boolean) v); break; }
-            } catch (Throwable ignored) {}
-        }
-
+        for (String m : neuters) { try { Object v = pokemon.getClass().getMethod(m).invoke(pokemon); if (v instanceof Boolean) { r.neutered = ((Boolean) v); break; } } catch (Throwable ignored) {} }
         r.statsLine = readStatsLine(pokemon);
         r.hp = readStat(pokemon, "getHP", "getHealth");
         r.ivs = readStats(pokemon, true);
@@ -211,7 +185,6 @@ public class PixelmonSpecUtil {
         }
         return 0;
     }
-
     private static String readStats(Object pokemon, boolean iv) {
         try {
             Method getObj = pokemon.getClass().getMethod(iv? "getIVs" : "getEVs");
@@ -239,7 +212,6 @@ public class PixelmonSpecUtil {
         } catch (Throwable ignored) {}
         return iv ? "31 31 31 31 31 31" : "0 0 0 0 0 0";
     }
-
     private static void readMoves(Object pokemon, Result r) {
         try {
             Method getMoveset = pokemon.getClass().getMethod("getMoveset");
@@ -265,7 +237,6 @@ public class PixelmonSpecUtil {
             }
         } catch (Throwable ignored) {}
     }
-
     private static String readStatsLine(Object pokemon) {
         try {
             Method getStats = pokemon.getClass().getMethod("getStats");
@@ -278,37 +249,66 @@ public class PixelmonSpecUtil {
                 } catch (Throwable ignored) {}
             }
             return join6(arr);
-        } catch (Throwable t) {
-            return "";
-        }
+        } catch (Throwable t) { return ""; }
     }
-
     private static String join6(int[] arr) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 6; i++) {
-            if (i > 0) sb.append(' ');
-            sb.append(arr[i]);
-        }
+        for (int i = 0; i < 6; i++) { if (i > 0) sb.append(' '); sb.append(arr[i]); }
         return sb.toString();
     }
 
+    private static String esc(String s) { return '\"' + s.replace("\\\"", "'") + '\"'; }
+    private static boolean nz(String s) { return s != null && !s.trim().isEmpty() && !"불명".equals(s); }
+    private static String cleanToken(String s) {
+        if (s == null) return "";
+        String t = s.trim();
+        if (t.contains(" ") || t.contains(":")) return "\"" + t.replace("\"","'") + "\"";
+        return t;
+        }
     private static String buildSpecStringFromPokemon(Object pokemon, Result r) {
         java.util.List<String> parts = new java.util.ArrayList<>();
-        parts.add(r.species);
+        parts.add(cleanToken(r.species));
         parts.add("level:" + r.level);
         if (r.nickname != null && !r.nickname.isEmpty()) parts.add("nickname:" + esc(r.nickname));
-        if (r.gender != null && !r.gender.isEmpty()) parts.add("gender:" + r.gender);
-        if (r.nature != null && !r.nature.isEmpty()) parts.add("nature:" + r.nature);
-        if (r.ability != null && !r.ability.isEmpty()) parts.add("ability:" + r.ability);
+        if (nz(r.gender)) parts.add("gender:" + cleanToken(r.gender));
+        if (nz(r.nature)) parts.add("nature:" + cleanToken(r.nature));
+        if (nz(r.ability)) parts.add("ability:" + cleanToken(r.ability));
         if (r.shiny) parts.add("shiny");
-        if (r.ball != null && !r.ball.isEmpty()) parts.add("ball:" + r.ball);
-        if (!r.moves.isEmpty()) {
-            StringBuilder mv = new StringBuilder();
-            for (int i = 0; i < r.moves.size(); i++) { if (i > 0) mv.append('/'); mv.append(r.moves.get(i)); }
-            parts.add("moves:" + mv);
-        }
+        if (nz(r.form)) parts.add("form:" + "\"" + r.form.replace("\"","'") + "\"");
+        if (nz(r.ball)) parts.add("ball:" + "\"" + r.ball.replace("\"","'") + "\"");
+        // moves는 스펙에 넣지 않음 (MoveRequirement 충돌 방지)
         return String.join(" ", parts);
     }
 
-    private static String esc(String s) { return '\"' + s.replace("\\\"", "'") + '\"'; }
+    /** 아이템 PDC Map에서 안전한(무기술) 스펙을 생성 */
+    public static String buildSafeSpecFromMap(java.util.Map<String, Object> m) {
+        Result r = new Result();
+        Object sp = m.get("species");
+        if (sp == null) sp = m.get("spec");
+        r.species = String.valueOf(sp != null ? sp : "Unknown");
+        Object lvl = m.get("level");
+        r.level = (lvl instanceof Number) ? ((Number) lvl).intValue() : 1;
+        r.gender = String.valueOf(m.getOrDefault("gender", ""));
+        r.nature = String.valueOf(m.getOrDefault("nature", ""));
+        r.ability = String.valueOf(m.getOrDefault("ability", ""));
+        Object shinyObj = m.get("shiny");
+        r.shiny = shinyObj instanceof Boolean ? (Boolean) shinyObj : false;
+        r.form = String.valueOf(m.getOrDefault("form", ""));
+        r.ball = String.valueOf(m.getOrDefault("ball", ""));
+        return buildSpecWithoutMoves(r);
+    }
+
+    /** moves: 를 포함하지 않는, 파서-안전 스펙 */
+    public static String buildSpecWithoutMoves(Result r) {
+        java.util.List<String> parts = new java.util.ArrayList<>();
+        parts.add(cleanToken(r.species));
+        parts.add("level:" + r.level);
+        if (nz(r.gender)) parts.add("gender:" + cleanToken(r.gender));
+        if (nz(r.nature)) parts.add("nature:" + cleanToken(r.nature));
+        if (nz(r.ability)) parts.add("ability:" + cleanToken(r.ability));
+        if (r.shiny) parts.add("shiny");
+        if (nz(r.form)) parts.add("form:" + "\"" + r.form.replace("\"","'") + "\"");
+        if (nz(r.ball)) parts.add("ball:" + "\"" + r.ball.replace("\"","'") + "\"");
+        return String.join(" ", parts);
+    }
 }
