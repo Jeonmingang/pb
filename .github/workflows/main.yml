@@ -1,11 +1,7 @@
 name: Build (Java 8 / Spigot 1.16.5)
-
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-
+  push: { branches: [ main, master ] }
+  pull_request: { branches: [ main, master ] }
 jobs:
   build:
     runs-on: ubuntu-latest
