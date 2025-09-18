@@ -57,7 +57,7 @@ public class JsonUtil {
             body = body.substring(1, body.length() - 1).trim();
         }
         if (body.isEmpty()) return map;
-        String[] parts = body.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+        String[] parts = body.split(",(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)");
         for (String part : parts) {
             String[] kv = part.split(":", 2);
             if (kv.length != 2) continue;
@@ -71,7 +71,7 @@ public class JsonUtil {
             } else if (v.startsWith("[")) {
                 String arr = v.substring(1, v.length() - 1).trim();
                 if (arr.isEmpty()) { map.put(k, new java.util.ArrayList<>()); continue; }
-                String[] elems = arr.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                String[] elems = arr.split(",(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)");
                 java.util.List<String> list = new java.util.ArrayList<>();
                 for (String el : elems) {
                     el = el.trim();
