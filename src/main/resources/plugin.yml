@@ -1,0 +1,16 @@
+name: UltimatePokeItemizer
+main: com.minkang.ultimate.pokeitem.Main
+version: 1.0.4
+api-version: 1.16
+author: minkang
+commands:
+  pokeitem:
+    description: Convert party pokemon to item.
+    aliases: [포켓몬아이템화, 포켓몬아이템, 포켓몬-아이템]
+  pokesummon:
+    description: Redeem held pokemon item.
+    aliases: [포켓몬소환, 포켓몬-소환]
+permissions:
+  pokeitemizer.use:
+    description: 기본 사용 권한 (기본 허용)
+    default: true
