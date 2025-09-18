@@ -17,17 +17,12 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.Map;
 
 public class PhotoItemListener implements Listener {
-
     private final Main plugin;
     private final NamespacedKey dataKey;
-
-    public PhotoItemListener(Main plugin) {
-        this.plugin = plugin;
-        this.dataKey = new NamespacedKey(plugin, "pp_data");
-    }
+    public PhotoItemListener(Main plugin){ this.plugin = plugin; this.dataKey = new NamespacedKey(plugin,"pp_data"); }
 
     @EventHandler
-    public void onUse(PlayerInteractEvent e) {
+    public void onUse(PlayerInteractEvent e){
         if (e.getHand() != EquipmentSlot.HAND) return;
         ItemStack item = e.getItem();
         if (item == null) return;
@@ -38,33 +33,22 @@ public class PhotoItemListener implements Listener {
         if (!pdc.has(dataKey, PersistentDataType.STRING)) return;
 
         e.setCancelled(true);
-        if (!plugin.isPixelmonPresent()) {
-            e.getPlayer().sendMessage(ChatColor.RED + "Pixelmon 모드가 필요합니다.");
-            return;
-        }
+        if (!plugin.isPixelmonPresent()) { e.getPlayer().sendMessage(ChatColor.RED + "Pixelmon 모드가 필요합니다."); return; }
 
         String b64 = pdc.get(dataKey, PersistentDataType.STRING);
-        if (b64 == null) {
-            e.getPlayer().sendMessage(ChatColor.RED + "사진 데이터가 손상되었습니다.");
-            return;
-        }
-        Map<String, Object> data = JsonUtil.decode(b64);
-        int slot = ((Number) data.getOrDefault("slot", 1)).intValue();
+        if (b64 == null) { e.getPlayer().sendMessage(ChatColor.RED + "사진 데이터가 손상되었습니다."); return; }
+        Map<String,Object> data = JsonUtil.decode(b64);
+        int slot = ((Number)data.getOrDefault("slot",1)).intValue();
 
         String nbt = (String) data.get("nbt");
-        if (nbt != null && !nbt.isEmpty()) {
-            boolean restored = PixelmonSpecUtil.restoreFromNBT(e.getPlayer(), nbt, slot);
-            if (!restored) {
-                String spec = String.valueOf(data.getOrDefault("spec", ""));
-                String key = plugin.getConfig().getString("pokegive-slot-key", "slot");
-                String cmd = "pokegive " + e.getPlayer().getName() + " " + spec + " " + key + ":" + slot;
-                e.getPlayer().performCommand(cmd);
-            }
-        } else {
-            String spec = String.valueOf(data.getOrDefault("spec", ""));
-            String key = plugin.getConfig().getString("pokegive-slot-key", "slot");
-            String cmd = "pokegive " + e.getPlayer().getName() + " " + spec + " " + key + ":" + slot;
-            e.getPlayer().performCommand(cmd);
+        boolean ok = false;
+        if (nbt != null && !nbt.isEmpty()) ok = PixelmonSpecUtil.restoreFromNBT(e.getPlayer(), nbt, slot);
+        if (!ok){
+            // 안전 폴백: moves 미포함 스펙 + 콘솔에서 pokegive 실행
+            String safeSpec = PixelmonSpecUtil.buildSafeSpecFromMap(data);
+            String key = plugin.getConfig().getString("pokegive-slot-key", "s");
+            String cmd = "pokegive " + e.getPlayer().getName() + " " + safeSpec + " " + key + ":" + slot;
+            org.bukkit.Bukkit.dispatchCommand(org.bukkit.Bukkit.getConsoleSender(), cmd);
         }
 
         int amt = item.getAmount();
