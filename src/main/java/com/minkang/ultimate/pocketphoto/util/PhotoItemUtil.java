@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 public class PhotoItemUtil {
-
     public static boolean givePhotoItem(Player p, PixelmonSpecUtil.Result res) {
         ItemStack it = buildPhotoItem(p, res);
         Map<Integer, ItemStack> leftover = p.getInventory().addItem(it);
@@ -125,18 +124,23 @@ public class PhotoItemUtil {
     }
 
     private static BufferedImage tryLoadSprite(String species) {
-        String key = species.toLowerCase().replace(' ', '_');
-        String[] paths = new String[]{
-            "assets/pixelmon/textures/gui/sprites/pokemon/" + key + ".png",
-            "assets/pixelmon/textures/pokemon/" + key + ".png",
-            "assets/pixelmon/textures/gui/pokemon/" + key + ".png"
-        };
-        for (String p : paths) {
-            try (InputStream is = Class.forName("com.pixelmonmod.pixelmon.Pixelmon").getClassLoader().getResourceAsStream(p)) {
-                if (is == null) continue;
-                return ImageIO.read(is);
-            } catch (Throwable ignored) {}
+        try {
+            String key = species.toLowerCase().replace(' ', '_');
+            String[] paths = new String[]{
+                "assets/pixelmon/textures/gui/sprites/pokemon/" + key + ".png",
+                "assets/pixelmon/textures/pokemon/" + key + ".png",
+                "assets/pixelmon/textures/gui/pokemon/" + key + ".png"
+            };
+            ClassLoader cl = Class.forName("com.pixelmonmod.pixelmon.Pixelmon").getClassLoader();
+            for (String p : paths) {
+                try (InputStream is = cl.getResourceAsStream(p)) {
+                    if (is == null) continue;
+                    return ImageIO.read(is);
+                } catch (Throwable ignored) {}
+            }
+            return null;
+        } catch (Throwable t) {
+            return null;
         }
-        return null;
     }
 }
