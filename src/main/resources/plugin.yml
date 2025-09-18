@@ -1,0 +1,16 @@
+name: UltimatePokeItemizer
+main: com.minkang.ultimate.pokeitem.Main
+version: 1.0.3
+api-version: 1.16
+author: minkang
+commands:
+  포켓몬아이템화:
+    description: 파티 슬롯의 포켓몬을 아이템으로 변환합니다.
+    usage: /포켓몬아이템화 <1~6>
+  포켓몬소환:
+    description: 손에 든 포켓몬 아이템을 파티로 되돌립니다.
+    usage: /포켓몬소환
+permissions:
+  pokeitemizer.use:
+    description: 기본 사용 권한 (기본 허용)
+    default: true
