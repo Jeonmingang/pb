@@ -1,0 +1,9 @@
+# PBBridge config
+backend: betterpokeitem
+run-as: player
+extra-args: ""
+require-empty-slots: 1
+messages:
+  usage: "&c사용법: /pb <1~6>"
+  invalid-slot: "&c슬롯은 1~6 사이만 가능합니다."
+  need-space: "&c인벤토리에 빈칸이 %need%칸 이상 있어야 보상을 받을 수 있습니다!"

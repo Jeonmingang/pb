@@ -1,0 +1,10 @@
+name: PBBridge
+main: com.minkang.pbbridge.PBBridge
+version: 1.0.1
+api-version: 1.16
+author: minkang
+commands:
+  pb:
+    description: 포켓몬 아이템화 브릿지 명령어
+    usage: "/pb <1~6>"
+    aliases: [포켓몬북]
