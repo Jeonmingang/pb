@@ -1,0 +1,17 @@
+
+name: PBBridge
+main: com.minkang.pbbridge.PBBridge
+version: 1.0.3
+api-version: 1.16
+author: minkang
+description: Proxy BetterPokeItem convert as console; adds /포켓사진 1~6.
+commands:
+  pbconvert:
+    description: Run BetterPokeItem convert as CONSOLE (permissionless by default)
+    usage: /pbconvert <args...>
+    aliases: [pokeconvert,bpi]
+  포켓사진:
+    description: 포켓몬 사진 변환을 콘솔 권한으로 실행 (/포켓사진 1~6)
+    usage: /포켓사진 <1~6>
+    aliases: [pokesnap,pokepic,pokephoto]
+permissions: {}

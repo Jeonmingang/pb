@@ -1,0 +1,25 @@
+
+# Global: If non-empty, this permission node is required to use /pbconvert and /포켓사진.
+# Leave empty ("") for permissionless usage.
+requirePermission: ""
+
+# Intercept player's "/pokeitem convert ..." and re-send as CONSOLE automatically.
+interceptPokeitem: true
+
+# Console command template for pbconvert. {args} = user args, {player} = player name.
+forwardCommand: "pokeitem convert {args}"
+
+photo:
+  minIndex: 1
+  maxIndex: 6
+  # Console command template for /포켓사진. {index} and {player} are available.
+  forwardCommand: "pokeitem convert {index}"
+  messages:
+    usage: "&e사용법: /포켓사진 <1~6>"
+    invalidIndex: "&c1~6 사이 숫자만 입력하세요."
+    success: "&a사진 변환을 요청했습니다."
+    denied: "&c이 명령은 현재 비활성화되어 있습니다."
+
+messages:
+  success: "&a변환 요청을 보냈습니다."
+  denied: "&c이 명령은 현재 비활성화되어 있습니다."
